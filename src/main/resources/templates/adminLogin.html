@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <style>
+    body {
+      display: grid;
+      place-items: center;
+      background-color: darkgrey;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .form_container {
+      background-color: white;
+      padding: 20px;
+      width: 300px;
+      margin: auto;
+      border-radius: 10px;
+      outline: 2px solid black;
+    }
+
+    .form_container h1 {
+      margin: 10px auto;
+      width: max-content;
+    }
+
+    label {
+      display: block;
+    }
+
+    .form_fields {
+      outline: 1px solid black;
+      width: 100%;
+      height: 22px;
+      border: none;
+      box-sizing: border-box;
+    }
+
+    .form_fields:focus {
+      outline: 1px solid #1964da;
+      box-shadow: none;
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      background-color: #1964da;
+      border: none;
+      color: white;
+      height: 26px;
+      transition: 0.5s border-radius ease;
+    }
+
+    input[type="submit"]:hover {
+      border-radius: 10px;
+      outline: 2px solid black;
+      cursor: pointer;
+    }
+
+    .form_error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+    <div class="form_container">
+    <h1>Admin Login</h1>
+
+        <form action="" method="post">
+
+            <label for="">Admin ID </label>
+            <span class="form_error"> </span>
+
+            <input type="text" name="" id="" class="form_fields">
+            <br><br>
+            <label for="">Password</label>
+            <span class="form_error"></span>
+            <input type="password" name="password" class="form_fields"> <br><br>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+
+<br><br>
+</body>
+</html>
