@@ -1,0 +1,39 @@
+body{
+    font-family: sans-serif;
+    margin: 0;
+}
+
+#panelContainer{
+    display: grid;
+    grid-template-columns: 200px auto;
+    width: 100%;
+    min-height: 100vh;
+}
+#displayPanel{
+    background-color:rgb(242, 245, 250);
+}
+#userdetails{
+    border-bottom: 5px solid rgb(242, 245, 250);
+    padding: 5px;
+}
+
+#userDetailsName{
+    font-style: italic;
+    font-size: 13px;
+    color: grey;
+}
+
+#sidebarMenu p{
+    border-bottom: 1px solid #1964da;
+    width: 170px;
+    margin-left: 5px;
+    padding: 5px 0px 5px 10px;
+    transition: 0.5s background-color ease, 0.3s border-radius ease;
+    cursor: pointer;
+}
+
+#sidebarMenu p:hover{
+    background-color: #1964da;
+    color: white;
+    border-radius: 10px;
+}

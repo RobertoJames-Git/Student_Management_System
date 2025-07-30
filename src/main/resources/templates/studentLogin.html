@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Student Login</title>
     <link rel="stylesheet" href="style/form_style.css">
     <link rel="stylesheet" href="style/login_style.css">
 </head>
 <body>
     <div class="form_container">
-    <h1>Admin Login</h1>
+    <h1>Student Login</h1>
 
         <form action="" method="post">
 
-            <label for="admID">Admin ID </label>
+            <label for="stdID">Student ID </label>
             <span class="form_error"> </span>
+            <input type="text" name="stdName" id="stdID" class="form_elements">
 
-            <input type="text" name="" id="admID" class="form_elements">
             <br><br>
+            
             <label for="pwdID">Password</label>
             <span class="form_error"></span>
             <input type="password" name="password" id="pwdID"  class="form_elements"> <br><br>
@@ -29,5 +30,6 @@
             <button class="form_elements form_buttons" onclick="location.href='index.html'"> Back to Home </button>
 
     </div>
+
 </body>
 </html>
