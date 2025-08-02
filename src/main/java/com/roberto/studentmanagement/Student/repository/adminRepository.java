@@ -3,6 +3,8 @@ package com.roberto.studentmanagement.Student.repository;
 import com.roberto.studentmanagement.Student.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -53,6 +55,17 @@ public class adminRepository {
     }
 
 
-
-
+    public ResponseEntity<String> deleteStudent(int studentID) {
+        try {
+            String sql = "Delete from student where studentID = ?";
+            int rowsAffected = jdbcTemplate.update(sql, studentID);
+            if (rowsAffected == 0){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student does not exist");
+            }
+        } catch (DataAccessException e) {
+            System.out.println("Data Access Error in deleteStudent : " +e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete student");
+        }
+        return ResponseEntity.ok("Successfully Removed student");
+    }
 }

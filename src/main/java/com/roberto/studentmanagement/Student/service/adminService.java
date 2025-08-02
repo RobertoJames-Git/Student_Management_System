@@ -3,6 +3,7 @@ package com.roberto.studentmanagement.Student.service;
 
 import com.roberto.studentmanagement.Student.model.Student;
 import com.roberto.studentmanagement.Student.repository.adminRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -57,7 +58,7 @@ public class adminService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate dob = LocalDate.parse(dobString, formatter);
         LocalDate today = LocalDate.now();
-        //return the the amount of years between the dob of the student and the current year
+        //return the amount of years between the dob of the student and the current year
         return Period.between(dob, today).getYears();
     }
 
@@ -66,5 +67,9 @@ public class adminService {
 
         return adminRepository.getAllStudents();
 
+    }
+
+    public ResponseEntity<String> deleteStudent(int studentID) {
+        return adminRepository.deleteStudent(studentID);
     }
 }

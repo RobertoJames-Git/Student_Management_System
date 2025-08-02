@@ -31,7 +31,21 @@ function getAllStudents(){
             return response.json();
         })
         .then(data => {
+            
             const container = document.getElementById('student_table');
+            
+            if (Array.isArray(data) && data.length === 0) {
+                const span = document.createElement('span');
+                span.className = 'form_error';
+                span.textContent = "No Students Found";
+                container.innerHTML = ''; // Clear previous content (optional)
+                container.appendChild(span);
+
+                console.log("No students found.");
+                return; // Exit early
+            }
+
+
 
             // Clear previous content (if any)
             container.innerHTML = '';
@@ -43,7 +57,7 @@ function getAllStudents(){
 
             // Create table header
             const headerRow = document.createElement('tr');
-            const headers = ['Student ID', 'First Name', 'Last Name', 'Email', 'Date of Birth'];
+            const headers = ['Student ID', 'First Name', 'Last Name', 'Email', 'Date of Birth','Remove Student'];
             headers.forEach(text => {
                 const th = document.createElement('th');
                 th.textContent = text;
@@ -66,6 +80,27 @@ function getAllStudents(){
                     row.appendChild(td);
                 });
 
+                // Create remove button
+                const button = document.createElement('button');
+                button.textContent = 'Remove';
+                button.style.margin = '0 8px';
+                button.style.padding = '6px 12px';
+                button.style.cursor = 'pointer';
+                button.style.width ='120px';
+
+                // Attach delete handler
+                button.onclick = function () {
+                    deleteStudent(student.studentID, row); // Pass row so it can be remove it after deletion
+                };
+
+                // Add button cell to row
+                const buttonCell = document.createElement('td');
+                buttonCell.appendChild(button);
+                buttonCell.style.border = '1px solid #ccc';
+                buttonCell.style.padding = '8px';
+                row.appendChild(buttonCell);
+
+                // Append row to table
                 table.appendChild(row);
             });
 
@@ -199,28 +234,75 @@ function clearAllSpansInForm(elementID) {
 }
 
 
-function displayServerMessage(serverMessage){
+let serverMessageTimeoutID; // Global or scoped outside the function
 
+function displayServerMessage(serverMessage) {
     const serverDiv = document.getElementById("server_msg");
 
-        // Extract the only key/value pair
-        const [[key, message]] = Object.entries(serverMessage);
-        const isSuccess = key === "true";
+    // Extract the only key/value pair
+    const [[key, message]] = Object.entries(serverMessage);
+    const isSuccess = key === "true";
 
-        // Set text
-        serverDiv.textContent = message;
+    // If message is already visible, cancel the previous timeout
+    if (serverDiv.style.display === "block" && serverMessageTimeoutID) {
+        clearTimeout(serverMessageTimeoutID);
+    }
 
-        // Apply border + text color
-        const color = isSuccess ? "green" : "red";
-        serverDiv.style.borderColor = color;
-        serverDiv.style.color = color;
+    // Set text and styles
+    serverDiv.textContent = message;
+    const color = isSuccess ? "green" : "red";
+    serverDiv.style.borderColor = color;
+    serverDiv.style.color = color;
 
-        // show message received from server for 5 seconds in the bottom left of the webpage
-        serverDiv.style.display = "block";
-        setTimeout(() => {
-            serverDiv.style.display = "none";
-        }, 5000);
+    // Show the message
+    serverDiv.style.display = "block";
+
+    // Start new timeout and store ID
+    serverMessageTimeoutID = setTimeout(() => {
+        serverDiv.style.display = "none";
+        serverMessageTimeoutID = null; // Reset the ID
+    }, 5000);
+}
 
 
+
+function deleteStudent(studentID, rowElement) {
+    fetch(`/deleteStudent?studentID=${encodeURIComponent(studentID)}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.text().then(message => {
+        const container = document.getElementById('student_table');
+
+        if (response.ok) {
+            const serverResponse = { true: message };
+            displayServerMessage(serverResponse); // Displays: "Successfully Removed student"
+
+            // Remove the row
+            rowElement.remove();
+
+            // Check if table has any remaining data rows
+            const table = container.querySelector('table');
+            if (table) {
+                const remainingRows = table.querySelectorAll('tr').length;
+
+                // If only the header remains (or nothing), remove the table
+                if (remainingRows <= 1) {
+                    container.innerHTML = ''; // Remove the table
+
+                    const span = document.createElement('span');
+                    span.className = 'form_error';
+                    span.textContent = "All Students were removed";
+                    container.appendChild(span);
+                }
+            }
+        } else {
+            const serverResponse = { false: message };
+            displayServerMessage(serverResponse); // Displays: error in bottom left of pge to user
+        }
+    }))
+    .catch(error => {
+        const serverResponse = { true: error };
+        displayServerMessage(serverResponse);
+    });
 }
 
