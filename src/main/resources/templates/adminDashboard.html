@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="style/dashboard.css">
+    <link rel="stylesheet" href="style/form_style.css">
+    <script src="javascript/adminDashboard.js"></script>
+
 </head>
+
 <body>
 
+    <div id="server_msg"></div>
+    
+        
     <div id="panelContainer">
         <div id="sidePanel">
             <div id="userdetails">
@@ -15,15 +23,82 @@
                 <span id="userDetailsName">Roberto James</span>
             </div>
             <div id="sidebarMenu">
-                <p>Add Student</p>
-                <p>Manage Grade</p>
-                <p>View All Students</p>
-                <p>Delete student Record</p>
-                <p>Manage Modules</p>
+                <p onclick="showForm('add_student')">Add Student</p>
+                <p onclick="showForm('manage_grade')">Manage Grade</p>
+                <p onclick="showForm('view_students')">View All Students</p>
+                <p onclick="showForm('delete_student')">Delete Student Record</p>
+                <p onclick="showForm('manage_modules')">Manage Modules</p>
+                <p onclick="location.href='/'">Back to Home</p>
             </div>
         </div>
-        <div id="displayPanel"></div>
+
+        <div id="displayPanel">
+            <br>
+            <!-- ADD STUDENT FORM -->
+            <div id="add_student" class="form_container">
+                <h1>Add Student</h1>
+
+                <form id="addStudentForm" action="/addStudent" method="post">
+
+                    <label for="first_name">First Name</label>
+                    <span class="form_error" id="fname_error"></span>
+                    <input type="text" name="fname" id="first_name">
+                    <br><br>
+
+                    <label for="last_name">Last Name</label>
+                    <span class="form_error" id="lname_error"></span>
+                    <input type="text" name="lname" id="last_name">
+                    <br><br>
+
+                    <label for="dobID">Date of Birth</label>
+                    <span class="form_error" id="dob_error"></span>
+                    <input type="date" name="dob" id="dobID">
+                    <br><br>
+
+                    <label for="emailID">Email</label>
+                    <span class="form_error" id="email_error"></span>
+                    <input type="email" name="email" id="emailID">
+                    <br><br>
+
+                    <label for="passwordID">Password</label>
+                    <span class="form_error" id="password_error"></span>
+                    <input type="password" name="password" id="passwordID">
+                    <br><br>
+
+                    <label for="confirm_password">Confirm Password</label>
+                    <span class="form_error" id="confirm_password_error"></span>
+                    <input type="password" name="confirmPassword" id="confirm_password">
+                    <br><br>
+
+                    <button type="reset">Clear</button><br><br>
+                    <button type="submit">Add Student</button>
+                </form>
+                
+                
+            </div>
+
+
+            <div id="manage_grade" class="form_container" style="display:none">
+            </div>
+
+                        <!-- Display all Students -->
+            <div id="view_students" class="form_container" style="display:none">
+                <h1>All Students</h1>
+                <div id="student_table">
+
+                </div>
+                
+            </div>
+            <div id="delete_student" class="form_container" style="display:none">
+              
+            </div>
+            <div id="manage_modules" class="form_container" style="display:none">
+              
+            </div>
+        </div>
     </div>
 
+    
 </body>
+
 </html>

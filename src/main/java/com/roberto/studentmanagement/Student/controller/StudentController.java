@@ -1,17 +1,10 @@
 package com.roberto.studentmanagement.Student.controller;
 
+import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-
-@Controller
+@RestController
 public class StudentController {
 
 
-
-    @GetMapping("/studentLogin")
-    public String studentLogin(){
-        return "studentLogin";
-    }
 
 }

@@ -2,7 +2,7 @@
 .form_container {
     background-color: white;
     padding: 20px;
-    width: 300px;
+    width: max-content;
     margin: auto;
     border-radius: 10px;
     outline: 2px solid black;
@@ -18,20 +18,21 @@ label {
     display: block;
 }
 
-.form_elements {
+input[type = 'text'],input[type = 'password'],input[type = 'email'],input[type = 'date'] {
     outline: 1px solid black;
-    width: 100%;
+    width: 300px;
     height: 22px;
     border: none;
     box-sizing: border-box;
+    
 }
 
-.form_elements:focus {
+input[type = 'text']:focus,input[type = 'password']:focus,input[type = 'email']:focus,input[type = 'date']:focus {
     outline: 1px solid #1964da;
     box-shadow: none;
 }
 
-.form_buttons {
+button {
     width: 100%;
     background-color: #1964da;
     border: none;
@@ -40,7 +41,7 @@ label {
     transition: 0.5s border-radius ease;
 }
 
-.form_buttons:hover {
+button:hover {
     border-radius: 10px;
     outline: 2px solid black;
     cursor: pointer;
@@ -49,3 +50,4 @@ label {
 .form_error {
     color: red;
 }
+

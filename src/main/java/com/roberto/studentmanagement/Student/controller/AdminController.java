@@ -1,14 +1,49 @@
 package com.roberto.studentmanagement.Student.controller;
 
-import org.springframework.stereotype.Controller;
+import com.roberto.studentmanagement.Student.model.Student;
+import com.roberto.studentmanagement.Student.service.adminService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
 public class AdminController {
 
+    @Autowired
+    private adminService adminService;
 
-    @GetMapping("/adminLogin")
-    public String adminDashboard(){
-        return "adminLogin";
+    @PostMapping("/addStudent")
+    public ResponseEntity<String> addStudent(@Valid @RequestBody Student student){
+
+        Map<Boolean,String> result = new HashMap<>();
+        result = adminService.addStudent(student);
+
+        //checks if there were any issues adding student record
+        if(result.get(false)!=null){
+            //returns error message to user
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.get(false));
+        }
+        // return success message
+        else {
+            return ResponseEntity.ok(result.get(true));
+        }
+
+
     }
+
+    @GetMapping("/getAllStudents")
+    public List<Student> getAllStudents(){
+        return adminService.getAllStudents();
+    }
+
+
 }

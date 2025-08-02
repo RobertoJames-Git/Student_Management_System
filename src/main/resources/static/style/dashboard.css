@@ -37,3 +37,24 @@ body{
     color: white;
     border-radius: 10px;
 }
+
+#server_msg {
+    display: none;
+    position: fixed;     
+    bottom: 1em;         
+    left: 1em;           
+    max-width: 300px;    
+    padding: 0.75em 1em;  
+    background: white;
+    color: black;
+    border-radius: 4px;
+    font-family: sans-serif;
+    font-size: 0.95rem;
+    z-index: 2;        
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    border: 1px solid black;
+}
+
+#add_student{
+    width: 300px;
+}

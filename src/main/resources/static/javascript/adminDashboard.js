@@ -1,0 +1,226 @@
+// Show only one form container at a time
+function showForm(elementID) {
+    const all = document.querySelectorAll('.form_container');
+    //elements in the div are not visible anymore
+    all.forEach(el => el.style.display = 'none');
+
+    const target = document.getElementById(elementID);//retrieves the Id of the element that is suppose to be visible
+    if (target) {
+        target.style.display = 'block';//displays the current div
+
+        // Update URL with elementID as a query parameter
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('elementID', elementID);
+        window.history.replaceState({}, '', newUrl);
+    }
+
+    if(elementID=='view_students'){
+        getAllStudents();
+        
+    }
+}
+
+
+function getAllStudents(){
+
+    fetch('/getAllStudents')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Fetch failed');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const container = document.getElementById('student_table');
+
+            // Clear previous content (if any)
+            container.innerHTML = '';
+
+            // Create table element
+            const table = document.createElement('table');
+            table.style.borderCollapse = 'collapse';
+            table.style.width = '100%';
+
+            // Create table header
+            const headerRow = document.createElement('tr');
+            const headers = ['Student ID', 'First Name', 'Last Name', 'Email', 'Date of Birth'];
+            headers.forEach(text => {
+                const th = document.createElement('th');
+                th.textContent = text;
+                th.style.border = '1px solid #000';
+                th.style.padding = '8px';
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            // Add rows for each student
+            data.forEach(student => {
+                const row = document.createElement('tr');
+
+                // Add student fields except password
+                ['studentID', 'fname', 'lname', 'email', 'dob'].forEach(key => {
+                    const td = document.createElement('td');
+                    td.textContent = student[key];
+                    td.style.border = '1px solid #ccc';
+                    td.style.padding = '8px';
+                    row.appendChild(td);
+                });
+
+                table.appendChild(row);
+            });
+
+            container.appendChild(table);
+        })
+        .catch(error => {
+            const container = document.getElementById('student_table');
+            container.innerHTML = '';
+
+            const errorMsg = document.createElement('p');
+            errorMsg.className = 'form_error';
+            errorMsg.textContent = 'Unable to get students.';
+            container.appendChild(errorMsg);
+        });
+
+}
+
+// On page load, check if elementID is present in the URL
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const elementID = urlParams.get('elementID');
+    //if elementID is present then display the container
+    if (elementID) {
+        showForm(elementID);
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+
+const form = document.getElementById('addStudentForm');
+const passErr   = document.getElementById('password_error');
+const confirmErr= document.getElementById('confirm_password_error');
+
+form.addEventListener('submit', async (evt) => {
+    //clears error message from form
+    clearAllSpansInForm('addStudentForm');
+
+    evt.preventDefault();//prevent page from refreshing on form submission
+    passErr.textContent = '';
+    confirmErr.textContent = '';
+
+    const pwd  = form.password.value;
+    const cPwd = form.confirmPassword.value;
+    if (pwd !== cPwd) {
+    confirmErr.textContent = 'Password and Confirm Password must match';
+    return;
+    }
+
+    const data = Object.fromEntries(new FormData(form).entries());
+    try {
+    const res = await fetch(form.action, {
+        method:  form.method,
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(data)
+    });
+
+    const contentType = res.headers.get('Content-Type') || '';
+
+    // Handle 4xx/5xx errors
+    if (!res.ok) {
+        // Try JSON first, then fallback to text
+        let errBody;
+        if (contentType.includes('application/json')) {
+            errBody = await res.json();
+            errBody.errors?.forEach(e => {
+            console.error(e.defaultMessage);
+            console.log(`${e.field}: ${e.defaultMessage}`);
+            //add error to corresponding span  that displays errors
+            document.getElementById(e.field+"_error").innerHTML = e.defaultMessage;
+            });
+        } else {
+        errBody = await res.text();
+        //display error when adding student records in console
+        console.error('Server error:', errBody);
+        if(errBody.includes('email')){
+            document.getElementById("email_error").textContent = errBody;
+            
+        }
+        else if(errBody.includes('18')){
+            document.getElementById("dob_error").textContent = errBody;
+        }
+        else if(errBody.includes('alphanumeric')){
+            document.getElementById("password_error").textContent=errBody
+        }
+        else{
+            const serverResponse = {false: "Failed to add student"};
+            //display error on webpage for user
+            displayServerMessage(serverResponse);
+        }
+        }
+        return;
+    }
+
+    // Success path: parse JSON or text
+    if (contentType.includes('application/json')) {
+        const result = await res.json();
+        console.log('Success (JSON):', result);
+    } else {
+        const text = await res.text();
+        console.log('Success (text):', text);
+
+        
+            const serverResponse = {
+            true: "Student Added Successfully"};
+            //display success message on webpage for user
+            displayServerMessage(serverResponse);
+            document.getElementById('addStudentForm').reset();//clear all fields in the form
+
+    }
+
+    } catch (networkError) {
+    console.error('Fetch failed:', networkError);
+    }
+});
+});
+
+
+function clearAllSpansInForm(elementID) {
+    const form = document.getElementById(elementID);
+    if (!form) return; // no such form on the page
+
+    // select all span elements inside the form
+    const spans = form.querySelectorAll('span');
+
+    // clear each one’s text
+    spans.forEach(span => {
+        span.textContent = '';
+    });
+}
+
+
+function displayServerMessage(serverMessage){
+
+    const serverDiv = document.getElementById("server_msg");
+
+        // Extract the only key/value pair
+        const [[key, message]] = Object.entries(serverMessage);
+        const isSuccess = key === "true";
+
+        // Set text
+        serverDiv.textContent = message;
+
+        // Apply border + text color
+        const color = isSuccess ? "green" : "red";
+        serverDiv.style.borderColor = color;
+        serverDiv.style.color = color;
+
+        // show message received from server for 5 seconds in the bottom left of the webpage
+        serverDiv.style.display = "block";
+        setTimeout(() => {
+            serverDiv.style.display = "none";
+        }, 5000);
+
+
+}
+
