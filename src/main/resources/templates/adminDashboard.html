@@ -76,8 +76,9 @@
                 
             </div>
 
-
+            <!-- Manage Grade-->
             <div id="manage_grade" class="form_container" style="display:none">
+                
             </div>
 
                         <!-- Display all Students -->
@@ -92,7 +93,31 @@
               
             </div>
             <div id="manage_modules" class="form_container" style="display:none">
-              
+                <h1>Manage Modules</h1>
+                <style>
+                    #module_actions{
+                        display: grid;
+                        grid-template-columns: auto auto auto ;
+                        column-gap: 10px;
+                        border-top: 1px solid black;
+                        border-bottom: 1px solid black;
+                        padding: 10px;
+                        align-items: center;
+                    }
+                    #module_actions p {
+                        margin: 0px 0px 0px 0px;
+                    }
+                </style>
+                <div id="module_actions">
+                    <p>Choose an action</p>
+                    <button>View and Remove Modules</button>
+                    <button>Add module</button>
+                </div>
+
+                <div id="manage_modules_content">
+                    
+                </div>
+
             </div>
         </div>
     </div>

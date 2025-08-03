@@ -45,8 +45,6 @@ function getAllStudents(){
                 return; // Exit early
             }
 
-
-
             // Clear previous content (if any)
             container.innerHTML = '';
 
@@ -54,15 +52,17 @@ function getAllStudents(){
             const table = document.createElement('table');
             table.style.borderCollapse = 'collapse';
             table.style.width = '100%';
-
+            table.style.borderRadius='10px';
             // Create table header
             const headerRow = document.createElement('tr');
             const headers = ['Student ID', 'First Name', 'Last Name', 'Email', 'Date of Birth','Remove Student'];
             headers.forEach(text => {
+                //create and style table heading
                 const th = document.createElement('th');
                 th.textContent = text;
-                th.style.border = '1px solid #000';
+                th.style.border = '1px solid #1964da';
                 th.style.padding = '8px';
+                //ad table heading to table
                 headerRow.appendChild(th);
             });
             table.appendChild(headerRow);
@@ -75,7 +75,7 @@ function getAllStudents(){
                 ['studentID', 'fname', 'lname', 'email', 'dob'].forEach(key => {
                     const td = document.createElement('td');
                     td.textContent = student[key];
-                    td.style.border = '1px solid #ccc';
+                    td.style.border = '1px solid #1964da';
                     td.style.padding = '8px';
                     row.appendChild(td);
                 });
@@ -96,8 +96,9 @@ function getAllStudents(){
                 // Add button cell to row
                 const buttonCell = document.createElement('td');
                 buttonCell.appendChild(button);
-                buttonCell.style.border = '1px solid #ccc';
+                buttonCell.style.border = '1px solid #1964da';
                 buttonCell.style.padding = '8px';
+
                 row.appendChild(buttonCell);
 
                 // Append row to table

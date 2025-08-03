@@ -1,7 +1,8 @@
 package com.roberto.studentmanagement.Student.controller;
 
+import com.roberto.studentmanagement.Student.model.Admin;
 import com.roberto.studentmanagement.Student.model.Student;
-import com.roberto.studentmanagement.Student.service.adminService;
+import com.roberto.studentmanagement.Student.service.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import java.util.Map;
 public class AdminController {
 
     @Autowired
-    private adminService adminService;
+    private AdminService adminService;
 
     @PostMapping("/addStudent")
     public ResponseEntity<String> addStudent(@Valid @RequestBody Student student){
@@ -47,5 +48,16 @@ public class AdminController {
         return adminService.deleteStudent(studentID);
     }
 
+    @PostMapping("/verifyAdminCredentials")
+    public ResponseEntity<String> verifyAdminCredentials(@RequestParam Admin admin){
+
+        return adminService.verifyAdminCredentials(admin);
+    }
+
+   /* @GetMapping('/getAllModules')
+    public List<Module> getAllModules(){
+
+    }
+*/
 
 }

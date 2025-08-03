@@ -1,8 +1,10 @@
 package com.roberto.studentmanagement.Student.service;
 
 
+import com.roberto.studentmanagement.Student.model.Admin;
 import com.roberto.studentmanagement.Student.model.Student;
-import com.roberto.studentmanagement.Student.repository.adminRepository;
+import com.roberto.studentmanagement.Student.repository.AdminRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class adminService {
+public class AdminService {
 
 
-    private final adminRepository adminRepository;
+    private final AdminRepository adminRepository;
+    private final PasswordService passwordService;
 
-    public adminService(adminRepository adminRepository){
+    public AdminService(AdminRepository adminRepository, PasswordService passwordService){
         this.adminRepository = adminRepository;
+        this.passwordService = passwordService;
     }
 
 
@@ -30,7 +34,7 @@ public class adminService {
 
         //check if student is 18 year older
         if(calculateAge(student.getDob())<18){
-            queryResponse.put(false,"Must be 18 years old");
+            queryResponse.put(false,"Must be 18 or older");
             return queryResponse;
         }
 
@@ -42,6 +46,11 @@ public class adminService {
             return queryResponse;
         }
 
+        //encrypt the users password
+        password = passwordService.encrypt(password);
+        student.setPassword(password);//change plain text password to encrypted password
+
+
         //check if student email already exist
         if (adminRepository.emailExist(student.getEmail())){
             queryResponse.put(false,"Use another email");
@@ -49,7 +58,7 @@ public class adminService {
         }
 
         //add student to the database
-        return addStudent(student);
+        return adminRepository.addStudent(student);
     }
 
 
@@ -64,12 +73,23 @@ public class adminService {
 
 
     public List<Student> getAllStudents() {
-
         return adminRepository.getAllStudents();
-
     }
 
     public ResponseEntity<String> deleteStudent(int studentID) {
         return adminRepository.deleteStudent(studentID);
+    }
+
+    public ResponseEntity<String> verifyAdminCredentials(Admin admin) {
+        //get admin details from database that corresponds to the ID
+        Admin adminFromDB= adminRepository.verifyAdminCredentials(admin);
+        String errorMsg="Invalid AdminID/Password";
+
+        //check if a admin was returned or if the hashed password in the database corresponds to what the user entered
+        if(adminFromDB == null|| !passwordService.compare(admin.getPassword(), adminFromDB.getPassword()) ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMsg);
+        }
+
+        return ResponseEntity.ok("Login Successful");
     }
 }

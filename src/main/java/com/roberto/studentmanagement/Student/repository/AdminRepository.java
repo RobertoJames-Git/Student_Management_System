@@ -1,8 +1,10 @@
 package com.roberto.studentmanagement.Student.repository;
 
+import com.roberto.studentmanagement.Student.model.Admin;
 import com.roberto.studentmanagement.Student.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -14,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class adminRepository {
+public class AdminRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -67,5 +69,20 @@ public class adminRepository {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete student");
         }
         return ResponseEntity.ok("Successfully Removed student");
+    }
+
+    public Admin verifyAdminCredentials(Admin admin) {
+
+        try {
+            String sql = "Select * from admin where adminID = ?";
+            return  jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Admin.class), admin.getAdminID());
+        }
+        catch (EmptyResultDataAccessException e){
+            return null;//An admin with the ID was not found
+        }
+        catch (DataAccessException e){
+            System.out.println("Data Access Exception in verifyAdminCredentials: " + e.getMessage());
+            return null;
+        }
     }
 }
