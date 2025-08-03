@@ -80,16 +80,21 @@ public class AdminService {
         return adminRepository.deleteStudent(studentID);
     }
 
-    public ResponseEntity<String> verifyAdminCredentials(Admin admin) {
-        //get admin details from database that corresponds to the ID
-        Admin adminFromDB= adminRepository.verifyAdminCredentials(admin);
-        String errorMsg="Invalid AdminID/Password";
+    public Admin verifyAdminCredentials(Admin admin) {
+        //get admin details from database that corresponds to the email
+        Admin adminFromDB= adminRepository.getAdminCredentials(admin);
 
-        //check if a admin was returned or if the hashed password in the database corresponds to what the user entered
-        if(adminFromDB == null|| !passwordService.compare(admin.getPassword(), adminFromDB.getPassword()) ){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMsg);
+        if (adminFromDB == null){
+            System.err.println("Null was returned");
         }
 
-        return ResponseEntity.ok("Login Successful");
+        //check if admin was returned or if the hashed password in the database corresponds to what the user entered
+        if(adminFromDB == null|| !passwordService.compare(admin.getPassword(), adminFromDB.getPassword()) ){
+            return null;
+        }
+
+
+
+        return adminFromDB;
     }
 }

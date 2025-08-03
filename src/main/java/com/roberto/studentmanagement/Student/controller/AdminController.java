@@ -3,6 +3,7 @@ package com.roberto.studentmanagement.Student.controller;
 import com.roberto.studentmanagement.Student.model.Admin;
 import com.roberto.studentmanagement.Student.model.Student;
 import com.roberto.studentmanagement.Student.service.AdminService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,14 @@ import java.util.Map;
 @RestController
 public class AdminController {
 
-    @Autowired
-    private AdminService adminService;
+
+    private final AdminService adminService;
+    private HttpSession httpSession;
+
+    public AdminController(AdminService adminService, HttpSession httpSession){
+        this.adminService = adminService;
+        this.httpSession = httpSession;
+    }
 
     @PostMapping("/addStudent")
     public ResponseEntity<String> addStudent(@Valid @RequestBody Student student){
@@ -49,10 +56,27 @@ public class AdminController {
     }
 
     @PostMapping("/verifyAdminCredentials")
-    public ResponseEntity<String> verifyAdminCredentials(@RequestParam Admin admin){
+    public ResponseEntity<?> verifyAdminCredentials(@Valid @RequestBody Admin admin) {
 
-        return adminService.verifyAdminCredentials(admin);
+        Admin verifiedAdmin = adminService.verifyAdminCredentials(admin);
+
+        if (verifiedAdmin != null) {
+            // Set session attributes
+            httpSession.setAttribute("fullname", verifiedAdmin.getFname() + " " + verifiedAdmin.getLname());
+            httpSession.setAttribute("email", verifiedAdmin.getEmail());
+
+            // Return redirect path to frontend
+            return ResponseEntity.ok("/adminDashboard");
+        }
+
+        // Return error if credentials invalid
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid AdminID or Password");
     }
+
+    /*@PostMapping("/addAdmin")
+    public ResponseEntity<String>addAdmin(@Valid @RequestBody){
+        //
+    }*/
 
    /* @GetMapping('/getAllModules')
     public List<Module> getAllModules(){

@@ -6,20 +6,21 @@
     <title>Admin Login</title>
     <link rel="stylesheet" href="style/form_style.css">
     <link rel="stylesheet" href="style/login_style.css">
+    <script src="javascript/adminLogin.js"></script>
 </head>
 <body>
-    <div class="form_container">
+    <div class="form_container" style="width: 300px;">
     <h1>Admin Login</h1>
 
-        <form action="" method="post">
+        <form>
 
-            <label for="admID">Admin ID </label>
-            <span class="form_error"> </span>
+            <label for="emailID">Email</label>
+            <span class="form_error" id="email_error"> </span>
 
-            <input type="text" name="" id="admID" >
+            <input type="email" name="email" id="emailID" >
             <br><br>
             <label for="pwdID">Password</label>
-            <span class="form_error"></span>
+            <span class="form_error" id="password_error"></span>
             <input type="password" name="password" id="pwdID"  > <br><br>
             <button type="submit" >Login</button>
             

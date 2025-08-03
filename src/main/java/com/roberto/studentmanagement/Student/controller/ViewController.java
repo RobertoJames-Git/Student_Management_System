@@ -25,4 +25,9 @@ public class ViewController {
     public String adminDashboard(){
         return "adminDashboard";
     }
+
+    @GetMapping("/addManyStudents")
+    public String addManyStudents(){
+        return "addManyStudents";
+    }
 }

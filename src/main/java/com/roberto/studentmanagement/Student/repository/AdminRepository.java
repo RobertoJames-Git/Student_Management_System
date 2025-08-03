@@ -71,14 +71,17 @@ public class AdminRepository {
         return ResponseEntity.ok("Successfully Removed student");
     }
 
-    public Admin verifyAdminCredentials(Admin admin) {
+    public Admin getAdminCredentials(Admin admin) {
 
         try {
-            String sql = "Select * from admin where adminID = ?";
-            return  jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Admin.class), admin.getAdminID());
+
+            //query the database to find an admin with the email
+            String sql = "Select * from admin where email = ?";
+            return  jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Admin.class), admin.getEmail());
         }
         catch (EmptyResultDataAccessException e){
-            return null;//An admin with the ID was not found
+            System.err.println("No admin was found");
+            return null;//An admin with the email was not found
         }
         catch (DataAccessException e){
             System.out.println("Data Access Exception in verifyAdminCredentials: " + e.getMessage());
