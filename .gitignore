@@ -3,7 +3,7 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-src/main/resources/static/javascript/adminDashboard.js
+src/main/resources/static/javascript/addManyStudents.js
 src/main/resources/templates/addManyStudents.html
 ### STS ###
 .apt_generated
