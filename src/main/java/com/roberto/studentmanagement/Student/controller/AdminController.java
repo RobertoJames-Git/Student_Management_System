@@ -1,6 +1,7 @@
 package com.roberto.studentmanagement.Student.controller;
 
 import com.roberto.studentmanagement.Student.model.Admin;
+import com.roberto.studentmanagement.Student.model.LoginRequest;
 import com.roberto.studentmanagement.Student.model.Student;
 import com.roberto.studentmanagement.Student.service.AdminService;
 import jakarta.servlet.http.HttpSession;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +43,6 @@ public class AdminController {
         else {
             return ResponseEntity.ok(result.get(true));
         }
-
-
     }
 
     @GetMapping("/getAllStudents")
@@ -56,27 +56,35 @@ public class AdminController {
     }
 
     @PostMapping("/verifyAdminCredentials")
-    public ResponseEntity<?> verifyAdminCredentials(@Valid @RequestBody Admin admin) {
+    public ResponseEntity<?> verifyAdminCredentials(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Admin verifiedAdmin = adminService.verifyAdminCredentials(admin);
+        Admin verifiedAdmin = adminService.verifyAdminCredentials(loginRequest);
 
         if (verifiedAdmin != null) {
             // Set session attributes
-            httpSession.setAttribute("fullname", verifiedAdmin.getFname() + " " + verifiedAdmin.getLname());
-            httpSession.setAttribute("email", verifiedAdmin.getEmail());
+            httpSession.setAttribute("adminFullName", verifiedAdmin.getFname() + " " + verifiedAdmin.getLname());
+            httpSession.setAttribute("adminEmail", verifiedAdmin.getEmail());
 
             // Return redirect path to frontend
             return ResponseEntity.ok("/adminDashboard");
         }
 
         // Return error if credentials invalid
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid AdminID or Password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials");
     }
 
-    /*@PostMapping("/addAdmin")
-    public ResponseEntity<String>addAdmin(@Valid @RequestBody){
-        //
-    }*/
+    @PostMapping("/addAdmin")
+    public ResponseEntity<String>addAdmin( @RequestBody Admin admin){
+
+        Map<Boolean, String> response =adminService.addAdmin(admin);
+
+        if(response.get(false)!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.get(false));
+        }
+        else{
+            return ResponseEntity.ok(response.get(true));
+        }
+    }
 
    /* @GetMapping('/getAllModules')
     public List<Module> getAllModules(){

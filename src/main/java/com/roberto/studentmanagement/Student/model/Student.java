@@ -26,7 +26,6 @@ public class Student {
     private String email;
 
     @NotBlank(message = "Date of Birth is required")
-
     private String dob;
 
     @NotBlank(message = "Password is required")

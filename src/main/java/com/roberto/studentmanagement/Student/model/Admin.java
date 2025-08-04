@@ -14,7 +14,9 @@ import org.springframework.stereotype.Repository;
 public class Admin {
     @NotBlank(message= "Field is required")
     private String email;
+    @NotBlank(message= "Field is required")
     private String fname;
+    @NotBlank(message= "Field is required")
     private String lname;
     @NotBlank(message = "Field is required")
     private String password;

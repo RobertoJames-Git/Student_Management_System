@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
   
     <meta charset="UTF-8">
@@ -20,7 +20,8 @@
         <div id="sidePanel">
             <div id="userdetails">
                 <span>Admin</span><br>
-                <span id="userDetailsName">Roberto James</span>
+                <span id="userDetailsName" th:text="${adminFullName}">Admin Name</span>
+
             </div>
             <div id="sidebarMenu">
                 <p onclick="showForm('add_student')">Add Student</p>

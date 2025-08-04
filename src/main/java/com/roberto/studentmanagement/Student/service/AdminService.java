@@ -2,8 +2,10 @@ package com.roberto.studentmanagement.Student.service;
 
 
 import com.roberto.studentmanagement.Student.model.Admin;
+import com.roberto.studentmanagement.Student.model.LoginRequest;
 import com.roberto.studentmanagement.Student.model.Student;
 import com.roberto.studentmanagement.Student.repository.AdminRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -52,7 +54,7 @@ public class AdminService {
 
 
         //check if student email already exist
-        if (adminRepository.emailExist(student.getEmail())){
+        if (adminRepository.studentEmailExist(student.getEmail())){
             queryResponse.put(false,"Use another email");
             return queryResponse;
         }
@@ -66,7 +68,7 @@ public class AdminService {
     public int calculateAge(String dobString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate dob = LocalDate.parse(dobString, formatter);
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now();//get todays date
         //return the amount of years between the dob of the student and the current year
         return Period.between(dob, today).getYears();
     }
@@ -80,21 +82,46 @@ public class AdminService {
         return adminRepository.deleteStudent(studentID);
     }
 
-    public Admin verifyAdminCredentials(Admin admin) {
+    public Admin verifyAdminCredentials(LoginRequest loginRequest) {
         //get admin details from database that corresponds to the email
-        Admin adminFromDB= adminRepository.getAdminCredentials(admin);
+        Admin adminFromDB= adminRepository.getAdminCredentials(loginRequest.getEmail());
 
         if (adminFromDB == null){
             System.err.println("Null was returned");
         }
 
         //check if admin was returned or if the hashed password in the database corresponds to what the user entered
-        if(adminFromDB == null|| !passwordService.compare(admin.getPassword(), adminFromDB.getPassword()) ){
+        if(adminFromDB == null|| !passwordService.compare(loginRequest.getPassword(), adminFromDB.getPassword()) ){
             return null;
         }
 
-
-
         return adminFromDB;
+    }
+
+    public Map<Boolean,String> addAdmin(Admin admin) {
+
+        Map<Boolean, String> response = new HashMap<>();
+        String password = admin.getPassword();
+
+        // Validate that the password is at least 8 characters and contains both letters and digits only
+        if (password.length() < 8 || !password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$")) {
+            response.put(false, "Must be at least 8 characters long and alphanumeric (contain both letters and digits)");
+            return response;
+        }
+
+        password = passwordService.encrypt(password);
+        admin.setPassword(password);
+
+        if(!adminRepository.addAdminToDatabase(admin)){
+            response.put(false,"Failed to add admin");
+        }
+        else{
+            response.put(true,"Admin added successfully");
+        }
+        return response;
+    }
+
+    public boolean adminEmailExist(String adminEmail) {
+        return adminRepository.adminEmailExist(adminEmail);
     }
 }
