@@ -86,10 +86,6 @@ public class AdminService {
         //get admin details from database that corresponds to the email
         Admin adminFromDB= adminRepository.getAdminCredentials(loginRequest.getEmail());
 
-        if (adminFromDB == null){
-            System.err.println("Null was returned");
-        }
-
         //check if admin was returned or if the hashed password in the database corresponds to what the user entered
         if(adminFromDB == null|| !passwordService.compare(loginRequest.getPassword(), adminFromDB.getPassword()) ){
             return null;

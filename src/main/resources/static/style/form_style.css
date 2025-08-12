@@ -8,7 +8,7 @@
     outline: 2px solid black;
 }
 
-.form_container h1 {
+.form_container h1,#manage_modules_content h2 {
     margin: 10px auto;
     width: max-content;
     border-bottom: 2px solid #1964da;
@@ -18,13 +18,18 @@ label {
     display: block;
 }
 
-input[type = 'text'],input[type = 'password'],input[type = 'email'],input[type = 'date'] {
+input[type = 'text'],input[type = 'password'],input[type = 'email'],input[type = 'date'],input[type='number'] {
     outline: 1px solid black;
     width: 300px;
     height: 22px;
     border: none;
     box-sizing: border-box;
+    margin-bottom: 17px;
     
+}
+
+button[type='reset']{
+    margin-bottom: 17px;
 }
 
 input[type = 'text']:focus,input[type = 'password']:focus,input[type = 'email']:focus,input[type = 'date']:focus {
@@ -51,3 +56,7 @@ button:hover {
     color: red;
 }
 
+
+.form_container form{
+    width: 300px;
+}

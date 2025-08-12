@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,19 +60,73 @@ public class AdminController {
     @PostMapping("/verifyAdminCredentials")
     public ResponseEntity<?> verifyAdminCredentials(@Valid @RequestBody LoginRequest loginRequest) {
 
+        //ensure user have up to 5 attempts
+        Object attempts = httpSession.getAttribute("admin_verification_attempts");
+
+        //if this is their first attempt then create a session with their amount of attempt
+        if(attempts == null){
+            httpSession.setAttribute("admin_verification_attempts", 5);
+        }
+
+
+        //if a user has 5 failed attempt there is a future time they will be allowed to make attempts
+        Object futureTime =  httpSession.getAttribute("future_time");
+        //check if user exceeded attempt count by checking if the current time the got all attempts wroong is set
+        if (futureTime!=null){
+
+            LocalDateTime futureTimeFromSession = (LocalDateTime) futureTime;
+            LocalDateTime now = LocalDateTime.now();
+            boolean hasPassed = now.isAfter(futureTimeFromSession);//check if user waited the entire 5 minutes
+
+            //calculate remaining time
+            Duration duration = Duration.between(LocalDateTime.now(), futureTimeFromSession);
+            long minutesLeft = duration.toMinutes();
+
+            System.out.println("Duration + " + duration.toSeconds());
+
+            if(!hasPassed) {//if time has not passed tell the user how much time is left
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wait " + (minutesLeft +1 ) + " min to try again");
+            }
+            else{//reset attempts to 5
+                httpSession.setAttribute("admin_verification_attempts", 5);
+                //clear time sessions used at login screen for verification
+                httpSession.removeAttribute("future_time");
+            }
+        }
+
+        //check the database to ensure admin matches the username and password
         Admin verifiedAdmin = adminService.verifyAdminCredentials(loginRequest);
+
 
         if (verifiedAdmin != null) {
             // Set session attributes
             httpSession.setAttribute("adminFullName", verifiedAdmin.getFname() + " " + verifiedAdmin.getLname());
             httpSession.setAttribute("adminEmail", verifiedAdmin.getEmail());
 
+            //clear sessions used at login screen for verification
+            httpSession.removeAttribute("admin_verification_attempts");
+            httpSession.removeAttribute("future_time");
+
             // Return redirect path to frontend
             return ResponseEntity.ok("/adminDashboard");
         }
 
+        //retrieve the number of attempts a user has left
+        int numOfAttempts = (int) httpSession.getAttribute("admin_verification_attempts");
+
+        numOfAttempts--;//reduce the number of attempts they have left
+
+        httpSession.setAttribute("admin_verification_attempts",numOfAttempts);
+
+        if (numOfAttempts <=1){
+            System.out.println("Attempts : "+numOfAttempts);
+            LocalDateTime now = LocalDateTime.now();//get current time
+            //set time 5 minutes from  the current time
+            httpSession.setAttribute("future_time", now.plusMinutes(5));
+        }
+
         // Return error if credentials invalid
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials "+ numOfAttempts +" attempts left.");
     }
 
     @PostMapping("/addAdmin")
@@ -85,6 +141,23 @@ public class AdminController {
             return ResponseEntity.ok(response.get(true));
         }
     }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession httpSession) {
+
+        Object adminFullName = httpSession.getAttribute("adminFullName");
+        Object adminEmail = httpSession.getAttribute("adminEmail");
+
+        if (adminFullName ==null && adminEmail ==null){
+            httpSession.invalidate(); // Invalidate the current user session
+        }
+
+        return ResponseEntity.ok("You have been logged out successfully.");
+    }
+
+
+
 
    /* @GetMapping('/getAllModules')
     public List<Module> getAllModules(){
