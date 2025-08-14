@@ -130,95 +130,167 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
+//wait until page loads
 document.addEventListener('DOMContentLoaded', () => {
 
 
-const form = document.getElementById('addStudentForm');
-const passErr   = document.getElementById('password_error');
-const confirmErr= document.getElementById('confirm_password_error');
+    const form = document.getElementById('addStudentForm');
+    const passErr   = document.getElementById('password_error');
+    const confirmErr= document.getElementById('confirm_password_error');
 
-form.addEventListener('submit', async (evt) => {
-    //clears error message from form
-    clearAllSpansInForm('addStudentForm');
+    form.addEventListener('submit', async (evt) => {
+        //clears error message from form
+        clearAllSpansInForm('addStudentForm');
 
-    evt.preventDefault();//prevent page from refreshing on form submission
-    passErr.textContent = '';
-    confirmErr.textContent = '';
+        evt.preventDefault();//prevent page from refreshing on form submission
+        passErr.textContent = '';
+        confirmErr.textContent = '';
 
-    const pwd  = form.password.value;
-    const cPwd = form.confirmPassword.value;
-    if (pwd !== cPwd) {
-    confirmErr.textContent = 'Password and Confirm Password must match';
-    return;
-    }
+        const pwd  = form.password.value;
+        const cPwd = form.confirmPassword.value;
+        if (pwd !== cPwd) {
+        confirmErr.textContent = 'Password and Confirm Password must match';
+        return;
+        }
 
-    const data = Object.fromEntries(new FormData(form).entries());
-    try {
-    const res = await fetch(form.action, {
-        method:  form.method,
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(data)
+        const data = Object.fromEntries(new FormData(form).entries());
+        try {
+        const res = await fetch(form.action, {
+            method:  form.method,
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(data)
+        });
+
+        const contentType = res.headers.get('Content-Type') || '';
+
+        // Handle 4xx/5xx errors
+        if (!res.ok) {
+            // Try JSON first, then fallback to text
+            let errBody;
+            if (contentType.includes('application/json')) {
+                errBody = await res.json();
+                errBody.errors?.forEach(e => {
+                console.error(e.defaultMessage);
+                console.log(`${e.field}: ${e.defaultMessage}`);
+                //add error to corresponding span  that displays errors
+                document.getElementById(e.field+"_error").innerHTML = e.defaultMessage;
+                });
+            } else {
+            errBody = await res.text();
+            //display error when adding student records in console
+            console.error('Server error:', errBody);
+            if(errBody.includes('email')){
+                document.getElementById("email_error").textContent = errBody;
+                
+            }
+            else if(errBody.includes('18')){
+                document.getElementById("dob_error").textContent = errBody;
+            }
+            else if(errBody.includes('alphanumeric')){
+                document.getElementById("password_error").textContent=errBody
+            }
+            else{
+                const serverResponse = {false: "Failed to add student"};
+                //display error on webpage for user
+                displayServerMessage(serverResponse);
+            }
+            }
+            return;
+        }
+
+        // Success path: parse JSON or text
+        if (contentType.includes('application/json')) {
+            const result = await res.json();
+            console.log('Success (JSON):', result);
+        } else {
+            const text = await res.text();
+            console.log('Success (text):', text);
+
+            
+        const serverResponse = {
+        true: "Student Added Successfully"};
+        //display success message on webpage for user
+        displayServerMessage(serverResponse);
+        document.getElementById('addStudentForm').reset();//clear all fields in the form
+
+        }
+
+        } catch (networkError) {
+        console.error('Fetch failed:', networkError);
+        }
     });
 
-    const contentType = res.headers.get('Content-Type') || '';
+    
+});
 
-    // Handle 4xx/5xx errors
-    if (!res.ok) {
-        // Try JSON first, then fallback to text
-        let errBody;
-        if (contentType.includes('application/json')) {
-            errBody = await res.json();
-            errBody.errors?.forEach(e => {
-            console.error(e.defaultMessage);
-            console.log(`${e.field}: ${e.defaultMessage}`);
-            //add error to corresponding span  that displays errors
-            document.getElementById(e.field+"_error").innerHTML = e.defaultMessage;
-            });
-        } else {
-        errBody = await res.text();
-        //display error when adding student records in console
-        console.error('Server error:', errBody);
-        if(errBody.includes('email')){
-            document.getElementById("email_error").textContent = errBody;
+
+
+//wait until page loads
+document.addEventListener('DOMContentLoaded', () => {
+
+    const form = document.getElementById('addModuleForm');
+
+    form.addEventListener('submit', async (evt) => {
+        // Clear all existing error messages before a new submission
+        clearAllSpansInForm('addModuleForm');
+        evt.preventDefault(); // Prevent page from refreshing on form submission
+ 
+        const data = {
+            moduleCode: document.getElementById("mCodeID").value,
+            moduleName: document.getElementById("mNameID").value,
+            credits: parseInt(document.getElementById("creditsID").value, 10)
             
-        }
-        else if(errBody.includes('18')){
-            document.getElementById("dob_error").textContent = errBody;
-        }
-        else if(errBody.includes('alphanumeric')){
-            document.getElementById("password_error").textContent=errBody
-        }
-        else{
-            const serverResponse = {false: "Failed to add student"};
-            //display error on webpage for user
-            displayServerMessage(serverResponse);
-        }
-        }
-        return;
-    }
+        };
 
-    // Success path: parse JSON or text
-    if (contentType.includes('application/json')) {
-        const result = await res.json();
-        console.log('Success (JSON):', result);
-    } else {
-        const text = await res.text();
-        console.log('Success (text):', text);
+        try {
+            const res = await fetch(form.action, {
+                method: form.method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-        
-            const serverResponse = {
-            true: "Student Added Successfully"};
-            //display success message on webpage for user
-            displayServerMessage(serverResponse);
-            document.getElementById('addStudentForm').reset();//clear all fields in the form
+            const contentType = res.headers.get('Content-Type') || '';
+            const responseBody = contentType.includes('application/json') ? await res.json() : await res.text();
 
-    }
+            if (!res.ok) {
+                // Handle 4xx/5xx errors
+                if (contentType.includes('application/json') && responseBody.errors) {
+                    // This block handles the detailed validation errors from the backend
+                    responseBody.errors.forEach(e => {
+                        console.error(`${e.field}: ${e.defaultMessage}`);
+                        const errorSpan = document.getElementById(e.field + "_error");
+                        if (errorSpan) {
+                            errorSpan.textContent = e.defaultMessage;
+                        }
+                    });
+                } else {
+                    // This block handles other types of errors, like a simple string response
+                    console.error('Server error:', responseBody);
+                    const serverResponse = {false:responseBody};
+                    displayServerMessage(serverResponse);
+                }
+                return;
+            }
 
-    } catch (networkError) {
-    console.error('Fetch failed:', networkError);
-    }
+            // Success path: The response status is 200 OK
+            if (responseBody) {
+                // The backend response body contains the success message
+                console.log('Success:', responseBody);
+                const serverResponse = {true:responseBody};
+                displayServerMessage(serverResponse);
+                document.getElementById('addModuleForm').reset(); // Clear all fields in the form
+            } 
+
+        } catch (networkError) {
+            console.error('Fetch failed:', networkError);
+            const networkErrorSpan = document.createElement('span');
+            networkErrorSpan.className = 'form_error';
+            networkErrorSpan.textContent = 'Network error. Please try again later.';
+            form.prepend(networkErrorSpan);
+        }
+    });
 });
-});
+
 
 
 function clearAllSpansInForm(elementID) {
@@ -306,4 +378,6 @@ function deleteStudent(studentID, rowElement) {
         displayServerMessage(serverResponse);
     });
 }
+
+
 

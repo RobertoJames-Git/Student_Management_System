@@ -79,70 +79,50 @@
 
             <!-- Manage Grade-->
             <div id="manage_grade" class="form_container" style="display:none">
-                
             </div>
 
-                        <!-- Display all Students -->
+            <!-- Display all Students -->
             <div id="view_students" class="form_container" style="display:none">
                 <h1>All Students</h1>
                 <div id="student_table">
-
-                </div>
+            </div>
                 
+        </div>
+
+        <!-- View and add modules -->
+        <div id="manage_modules" class="form_container" style="display:none">
+            <h1>Manage Modules</h1>
+
+            <div id="module_actions">
+                <p>Choose an action</p>
+                <button>View and Remove Modules</button>
+                <button>Add a module</button>
             </div>
-            <div id="delete_student" class="form_container" style="display:none">
-              
-            </div>
-            <div id="manage_modules" class="form_container" style="display:none">
-                <h1>Manage Modules</h1>
-                <style>
-                    #module_actions{
-                        display: grid;
-                        grid-template-columns: auto auto auto ;
-                        column-gap: 10px;
-                        padding: 10px;
-                        align-items: center;
-                    }
-                    #module_actions p {
-                        margin: 0px 0px 0px 0px;
-                    }
-                    #manage_modules_content{
-                        width: 300px;
-                        border: 2px solid black;
-                        border-radius: 10px;
-                        margin: auto;
-                        padding: 10px;
-                        margin-top: 15px;
-                    }
-                </style>
-                <div id="module_actions">
-                    <p>Choose an action</p>
-                    <button>View and Remove Modules</button>
-                    <button>Add a module</button>
-                </div>
 
-                <div id="manage_modules_content" >
-                    <h2>Add Modules</h2>
-                    <form id="addModuleForm" action="" method="post">
-                        <label for="mCodeID">Module Code</label>
-                        <span class="form_error" id="moduleCode_error"></span>
-                        <input type="text" name="moduleCode" id="mCodeID">
+            <div id="manage_modules_content" >
+                <h2>Add Modules</h2>
 
-                        <label for="mNameID">Module Name</label>
-                        <span class="form_error" id="moduleName_error"></span>
-                        <input type="text" name="moduleName" id="mNameID">
+                <form id="addModuleForm" action="/addModule" method="post">
+                    <label for="mCodeID">Module Code</label>
+                    <span class="form_error" id="moduleCode_error"></span>
+                    <input type="text" name="moduleCode" id="mCodeID">
 
-                        <label for="">Credits</label>
-                        <span class="form_error" id="moduleCredits_error"></span>
-                        <input type="number" name="moduleCredits" id="" min="1" max="4" placeholder="From 1 to 4">
+                    <label for="mNameID">Module Name</label>
+                    <span class="form_error" id="moduleName_error"></span>
+                    <input type="text" name="moduleName" id="mNameID">
 
-                        <button type="reset">Reset</button>
-                        <button type="submit">Add Module</button>
+                    <label for="creditsID">Credits</label>
+                    <span class="form_error" id="credits_error"></span>
+                    <input type="number" name="credits" id="creditsID" placeholder="Min = 1 and Max = 4">
 
-                    </form>
-                </div>
+                    <button type="reset">Reset</button>
+                    <button type="submit">Add Module</button>
+                </form>
 
             </div>
+
+        </div>
+
         </div>
     </div>
 

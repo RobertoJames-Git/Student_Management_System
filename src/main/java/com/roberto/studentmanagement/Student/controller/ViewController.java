@@ -42,8 +42,10 @@ public class ViewController {
         if(adminEmail == null || !adminService.adminEmailExist(adminEmail)){
             return"/adminLogin";//redirect user to login form if they are not logged in
         }
-
+        
+        //add fullname and email to model so it can be used later
         model.addAttribute("adminFullName", (String) httpSession.getAttribute("adminFullName") );
+
         return "adminDashboard";
     }
 

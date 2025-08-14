@@ -1,10 +1,12 @@
 package com.roberto.studentmanagement.Student.repository;
 
 import com.roberto.studentmanagement.Student.model.Admin;
+import com.roberto.studentmanagement.Student.model.Module;
 import com.roberto.studentmanagement.Student.model.Student;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.tree.RowMapper;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,4 +125,30 @@ public class AdminRepository {
 
         return true;//email was found in database
     }
+
+
+    public ResponseEntity<String> addModuleToDatabase(Module module) {
+
+
+        try {
+            String sql = "insert into module (moduleCode, moduleName, credits, addedBy) values (?, ?, ?, ?)";
+            int rowsAffected = jdbcTemplate.update(sql, module.getModuleCode(), module.getModuleName(), module.getCredits(), module.getAdded_by());
+
+            if (rowsAffected == 0) {
+                return ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to add module");
+            }
+        } catch (DuplicateKeyException e) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("Module with code " + module.getModuleCode() + " already exists");
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Module added successfully");
+    }
+
+
 }

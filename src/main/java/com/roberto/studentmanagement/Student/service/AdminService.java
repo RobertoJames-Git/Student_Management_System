@@ -4,9 +4,9 @@ package com.roberto.studentmanagement.Student.service;
 import com.roberto.studentmanagement.Student.model.Admin;
 import com.roberto.studentmanagement.Student.model.LoginRequest;
 import com.roberto.studentmanagement.Student.model.Student;
+import com.roberto.studentmanagement.Student.model.Module;
 import com.roberto.studentmanagement.Student.repository.AdminRepository;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -120,4 +120,10 @@ public class AdminService {
     public boolean adminEmailExist(String adminEmail) {
         return adminRepository.adminEmailExist(adminEmail);
     }
+
+    public ResponseEntity<String> addModule(Module module) {
+        return adminRepository.addModuleToDatabase(module);
+
+    }
+
 }

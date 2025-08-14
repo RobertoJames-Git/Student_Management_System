@@ -3,14 +3,14 @@ package com.roberto.studentmanagement.Student.controller;
 import com.roberto.studentmanagement.Student.model.Admin;
 import com.roberto.studentmanagement.Student.model.LoginRequest;
 import com.roberto.studentmanagement.Student.model.Student;
+import com.roberto.studentmanagement.Student.model.Module;
 import com.roberto.studentmanagement.Student.service.AdminService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -33,6 +33,11 @@ public class AdminController {
     @PostMapping("/addStudent")
     public ResponseEntity<String> addStudent(@Valid @RequestBody Student student){
 
+        //check if admin is logged in and is a valid admin
+        if (!adminIsLoggedIn(httpSession)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Request : Admin must be logged in");
+        }
+
         Map<Boolean,String> result = new HashMap<>();
         result = adminService.addStudent(student);
 
@@ -49,11 +54,22 @@ public class AdminController {
 
     @GetMapping("/getAllStudents")
     public List<Student> getAllStudents(){
+
+        //check if admin is logged in and is a valid admin
+        if (!adminIsLoggedIn(httpSession)){
+            return null;
+        }
         return adminService.getAllStudents();
     }
 
     @DeleteMapping("/deleteStudent")
     public ResponseEntity<String> deleteStudent(@RequestParam int studentID){
+
+        //check if admin is logged in and is a valid admin
+        if (!adminIsLoggedIn(httpSession)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Request : Admin must be logged in");
+        }
+
         return adminService.deleteStudent(studentID);
     }
 
@@ -129,6 +145,7 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials "+ numOfAttempts +" attempts left.");
     }
 
+
     @PostMapping("/addAdmin")
     public ResponseEntity<String>addAdmin( @RequestBody Admin admin){
 
@@ -157,12 +174,37 @@ public class AdminController {
     }
 
 
+    @PostMapping("/addModule")
+    public ResponseEntity<?> addModule(@Valid @RequestBody Module module, HttpSession httpSession){
 
+        //check if admin is logged in and is a valid admin
+        if (!adminIsLoggedIn(httpSession)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Request : Admin must be logged in");
+        }
+        //retrieve admin email from session
+        Object adminEmail  = httpSession.getAttribute("adminEmail");
+        //check if a email was set
+        if (adminEmail == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin Email is needed");
+        }
 
-   /* @GetMapping('/getAllModules')
-    public List<Module> getAllModules(){
+        module.setAdded_by((String) adminEmail);//set added by using admin_email from session data
+
+        return adminService.addModule(module);
+
 
     }
-*/
+
+
+    public Boolean adminIsLoggedIn(HttpSession httpSession){
+        //retrieve admin email from session
+        Object adminEmail = httpSession.getAttribute("adminEmail");
+
+        if(adminEmail==null){//if adminEmail cannot be retrieved from
+           return false;
+        }
+        return adminService.adminEmailExist((String) adminEmail);
+    }
+
 
 }
